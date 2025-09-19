@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perbandingan RF vs XGBoost - Portfolio Data Scientist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #2ecc71;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --text-light: #6c757d;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: var(--primary-color);
+            color: white;
+            padding: 18px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+            margin-left: 4px;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .back-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Main content wrapper */
+        .main-content {
+            flex: 1 0 auto;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(46, 204, 113, 0.1) 100%);
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 50px;
+        }
+        
+        .hero h1 {
+            color: var(--primary-color);
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            color: var(--text-light);
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .academic-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            margin-top: 15px;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .academic-badge i {
+            margin-right: 10px;
+        }
+        
+        /* Full Width Image Section */
+        .full-width-image {
+            margin: 50px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .full-width-image:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .full-width-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .image-caption {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            font-style: italic;
+            color: var(--text-light);
+            border-top: 1px solid #eee;
+        }
+        
+        /* Project Content */
+        .project-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .project-info {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .project-info:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .project-info h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .project-info h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .project-info p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .project-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .meta-item {
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .meta-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .meta-item h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .meta-item h3 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .meta-item p {
+            color: var(--text-color);
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+        
+        .tech-stack {
+            margin-top: 35px;
+        }
+        
+        .tech-stack h3 {
+            color: var(--primary-color);
+            margin-bottom: 18px;
+            font-size: 1.2rem;
+        }
+        
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .tech-tag {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #5dade2 100%);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+        
+        .tech-tag:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* Section Styling */
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-title h2 {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+        
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Project Details Section */
+        .project-details {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 60px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .project-details:hover {
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .detail-item {
+            margin-bottom: 35px;
+        }
+        
+        .detail-item h3 {
+            color: var(--primary-color);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+        
+        .detail-item h3 i {
+            margin-right: 12px;
+            color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.1);
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        
+        .detail-item p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .detail-item ul {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+        
+        .detail-item li {
+            margin-bottom: 10px;
+            line-height: 1.8;
+            position: relative;
+        }
+        
+        .detail-item li:before {
+            content: '•';
+            color: var(--secondary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        /* Comparison Section */
+        .comparison {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 60px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .comparison:hover {
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 30px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 18px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .comparison-table td:first-child {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* Results Section */
+        .project-results {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 60px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .project-results:hover {
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .result-card {
+            background: var(--light-color);
+            padding: 30px 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-card i {
+            font-size: 2.8rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            background: rgba(52, 152, 219, 0.1);
+            width: 70px;
+            height: 70px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+        }
+        
+        .result-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .result-card p {
+            color: var(--text-light);
+        }
+        
+        /* Notebook Section */
+        .notebook-section {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(52, 152, 219, 0.05) 100%);
+            padding: 60px 0;
+            margin: 40px 0;
+            border-radius: 15px;
+        }
+        
+        .notebook-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .notebook-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .notebook-content p {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .notebook-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .notebook-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 25px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notebook-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .notebook-link i {
+            margin-right: 10px;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .social-links {
+            margin-bottom: 25px;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            margin: 0 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        .social-links a:hover {
+            background: var(--secondary-color);
+            transform: translateY(-5px);
+        }
+        
+        footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .project-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .notebook-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .notebook-link {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .project-header h1 {
+                font-size: 2rem;
+            }
+            
+            .project-details,
+            .project-results,
+            .comparison {
+                padding: 30px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-tags {
+                justify-content: center;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .hero {
+                padding: 60px 0 40px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .notebook-content {
+                padding: 30px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .project-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .project-header p {
+                font-size: 1rem;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .project-info, 
+            .project-details,
+            .project-results,
+            .comparison {
+                padding: 25px;
+            }
+            
+            .result-card {
+                padding: 20px 15px;
+            }
+            
+            .notebook-content {
+                padding: 20px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animated {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        /* Scroll to Top Button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .scroll-top:hover {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>Data<span>Portfolio</span>
+            </div>
+            <a href="../portfolio.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Kembali ke Portfolio
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1 class="animated">Perbandingan Random Forest vs XGBoost untuk Prediksi Harga Rumah</h1>
+                <p class="animated delay-1">Analisis komprehensif perbandingan performa algoritma Random Forest dan XGBoost dalam memprediksi harga properti residensial di wilayah Jabodetabek</p>
+                <div class="academic-badge animated delay-2">
+                    <i class="fas fa-graduation-cap"></i> Tugas Akhir / Skripsi
+                </div>
+            </div>
+        </section>
+
+        <!-- Full Width Landscape Image -->
+        <div class="container">
+            <div class="full-width-image animated">
+                <img src="../image/pricehome.png" alt="Grafik Perbandingan Random Forest dan XGBoost untuk Prediksi Harga Rumah">
+                <div class="image-caption">
+                    Visualisasi Perbandingan Performa Random Forest vs XGBoost
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Detail Section -->
+        <section class="project-detail">
+            <div class="container">
+                <div class="project-content">
+                    <div class="project-info animated delay-1">
+                        <h2>Informasi Proyek</h2>
+                        <p>Penelitian ini membandingkan performa dua algoritma machine learning populer - Random Forest dan XGBoost - dalam memprediksi harga rumah di wilayah Jabodetabek berdasarkan berbagai fitur properti dan lokasi.</p>
+                        
+                        <div class="project-meta">
+                            <div class="meta-item">
+                                <h3><i class="fas fa-tasks"></i> Jenis</h3>
+                                <p>Tugas Akhir / Skripsi</p>
+                            </div>
+                            <div class="meta-item">
+                                <h3><i class="fas fa-calendar-alt"></i> Tanggal</h3>
+                                <p>Agustus 2024</p>
+                            </div>
+                            <div class="meta-item">
+                                <h3><i class="fas fa-layer-group"></i> Kategori</h3>
+                                <p>Machine Learning</p>
+                            </div>
+                            <div class="meta-item">
+                                <h3><i class="fas fa-database"></i> Dataset</h3>
+                                <p>3,510 properti (setelah preprocessing)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tech-stack">
+                            <h3>Teknologi yang Digunakan</h3>
+                            <div class="tech-tags">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">Pandas</span>
+                                <span class="tech-tag">Scikit-learn</span>
+                                <span class="tech-tag">XGBoost</span>
+                                <span class="tech-tag">Matplotlib</span>
+                                <span class="tech-tag">Seaborn</span>
+                                <span class="tech-tag">Jupyter</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-info animated delay-2">
+                        <h2>Konteks Bisnis</h2>
+                        <p>Proyek ini memiliki implikasi penting bagi sektor properti dan real estate:</p>
+                        
+                        <div class="detail-item">
+                            <h3><i class="fas fa-home"></i> Valuasi Properti</h3>
+                            <p>Membantu agen properti dan calon pembeli dalam menentukan harga wajar sebuah properti berdasarkan karakteristiknya.</p>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <h3><i class="fas fa-chart-line"></i> Analisis Pasar</h3>
+                            <p>Memberikan insight tentang faktor-faktor yang paling mempengaruhi harga properti di wilayah Jabodetabek.</p>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <h3><i class="fas fa-calculator"></i> Optimasi Investasi</h3>
+                            <p>Membantu investor properti dalam mengambil keputusan investasi yang lebih terinformasi.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-details animated delay-2">
+                    <div class="section-title">
+                        <h2>Detail Penelitian</h2>
+                        <p>Penjelasan mendalam tentang metodologi, data, dan teknik analisis yang digunakan</p>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3><i class="fas fa-target"></i> Latar Belakang</h3>
+                        <p>Wilayah Jabodetabek merupakan kawasan metropolitan terbesar di Indonesia dengan pertumbuhan populasi dan infrastruktur yang pesat, menyebabkan permintaan akan properti, khususnya rumah, terus meningkat. Penelitian ini membandingkan dua algoritma ensemble learning, Random Forest dan XGBoost, untuk memprediksi harga jual rumah di wilayah Jabodetabek.</p>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3><i class="fas fa-database"></i> Sumber Data</h3>
+                        <p>Dataset penelitian bersumber dari situs Kaggle yang berfokus pada data penjualan rumah di wilayah Jabodetabek:</p>
+                        <ul>
+                            <li>Dataset asli: 3,553 baris dan 14 kolom</li>
+                            <li>Data dikumpulkan dari marketplace rumah123.com</li>
+                            <li>Variabel meliputi: harga, kota, kamar tidur, kamar mandi, luas tanah, luas bangunan, tempat parkir, kelistrikan, dan lainnya</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3><i class="fas fa-cogs"></i> Metodologi</h3>
+                        <p>Penelitian menggunakan pendekatan berikut:</p>
+                        <ul>
+                            <li>Praproses data: handling missing values, encoding kategorikal, outlier detection</li>
+                            <li>Seleksi fitur menggunakan korelasi Pearson (hanya fitur dengan korelasi > 0.5)</li>
+                            <li>Pembagian data: 80% training, 20% testing</li>
+                            <li>Pemodelan dengan Random Forest dan XGBoost (default dan tuning parameter)</li>
+                            <li>Validasi menggunakan K-Fold Cross Validation (k=10)</li>
+                            <li>Evaluasi dengan RMSE, MAE, dan MAPE</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3><i class="fas fa-sliders-h"></i> Preprocessing Data</h3>
+                        <p>Beberapa teknik preprocessing yang diterapkan:</p>
+                        <ul>
+                            <li>Penanganan missing values dengan drop cell, imputasi modus, dan interpolasi</li>
+                            <li>Encoding variabel kategorikal (kondisi_properti, perabotan, kota)</li>
+                            <li>Deteksi outlier menggunakan metode Z-score</li>
+                            <li>Transformasi logaritma pada variabel target (harga)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="comparison animated delay-3">
+                    <div class="section-title">
+                        <h2>Perbandingan Metode</h2>
+                        <p>Analisis komparatif antara algoritma Random Forest dan XGBoost</p>
+                    </div>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Aspek</th>
+                                <th>Random Forest</th>
+                                <th>XGBoost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Prinsip Algoritma</td>
+                                <td>Ensemble bagging dengan multiple decision trees</td>
+                                <td>Ensemble boosting dengan gradient boosting</td>
+                            </tr>
+                            <tr>
+                                <td>Hyperparameter Default</td>
+                                <td>n_estimators=100, max_depth=None, min_samples_split=2, min_samples_leaf=1</td>
+                                <td>n_estimators=100, max_depth=7, learning_rate=0.3, subsample=1</td>
+                            </tr>
+                            <tr>
+                                <td>Hyperparameter Tuning</td>
+                                <td>max_depth=50, max_features=7</td>
+                                <td>max_depth=50, learning_rate=0.1, subsample=0.6, reg_alpha=0.01, reg_lambda=0.1</td>
+                            </tr>
+                            <tr>
+                                <td>Waktu Training</td>
+                                <td>Relatif lebih cepat</td>
+                                <td>Relatif lebih lambat (dapat diakselerasi dengan GPU)</td>
+                            </tr>
+                            <tr>
+                                <td>Kemudahan Implementasi</td>
+                                <td>Mudah, tanpa perlu tuning kompleks</td>
+                                <td>Membutuhkan perhatian lebih pada tuning parameter</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="project-results">
+                    <div class="section-title">
+                        <h2>Hasil Penelitian</h2>
+                        <p>Metrik evaluasi dan hasil prediksi model machine learning yang dikembangkan</p>
+                    </div>
+                    
+                    <div class="results-grid">
+                        <div class="result-card animated">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h3>RMSE Terbaik: 0.30</h3>
+                            <p>XGBoost dengan tuning parameter mencapai RMSE terendah</p>
+                        </div>
+                        
+                        <div class="result-card animated delay-1">
+                            <i class="fas fa-percentage"></i>
+                            <h3>MAE Terbaik: 0.18</h3>
+                            <p>XGBoost dengan tuning parameter mencapai MAE terendah</p>
+                        </div>
+                        
+                        <div class="result-card animated delay-2">
+                            <i class="fas fa-trophy"></i>
+                            <h3>MAPE Terbaik: 0.84%</h3>
+                            <p>XGBoost dengan tuning parameter mencapai akurasi tertinggi</p>
+                        </div>
+                        
+                        <div class="result-card animated delay-3">
+                            <i class="fas fa-clock"></i>
+                            <h3>Waktu Training</h3>
+                            <p>Random Forest lebih cepat dalam training (1.69s vs 4.71s)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3><i class="fas fa-chart-line"></i> Kesimpulan</h3>
+                        <p>Berdasarkan hasil penelitian, Random Forest menghasilkan prediksi harga jual rumah yang lebih baik dengan nilai RMSE 0.33, MAE 0.20, dan MAPE 0.91% pada model default. Namun setelah tuning parameter, XGBoost menunjukkan penurunan nilai error dengan RMSE 0.30, MAE 0.18, dan MAPE 0.84%.</p>
+                        <p>Random Forest lebih mudah diterapkan tanpa perlu tuning parameter yang kompleks, sementara XGBoost membutuhkan perhatian lebih pada tuning parameter untuk mengoptimalkan performa terbaiknya. Pemilihan algoritma tergantung pada kebutuhan antara kemudahan implementasi dan akurasi tertinggi.</p>
+                    </div>
+                </div>
+
+                <!-- Notebook Section -->
+                <section class="notebook-section animated">
+                    <div class="container">
+                        <div class="notebook-content">
+                            <h2><i class="fas fa-code"></i> Jupyter Notebook</h2>
+                            <p>Jelajahi implementasi lengkap analisis data, preprocessing, pemodelan machine learning, dan evaluasi dalam Jupyter Notebook interaktif. Notebook ini berisi kode lengkap, visualisasi, dan penjelasan mendetail tentang setiap langkah penelitian.</p>
+                            
+                            <div class="notebook-links">
+                                <a href="https://github.com/username/project-repo/blob/main/house_price_prediction.ipynb" class="notebook-link" target="_blank">
+                                    <i class="fab fa-github"></i> Lihat di GitHub
+                                </a>
+                                <a href="https://colab.research.google.com/drive/1mKJLRqlaspHIx2kzxff-9X-mha_BFqmK" class="notebook-link" target="_blank">
+                                    <i class="fab fa-google"></i> Buka di Google Colab
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+            <p>&copy; 2025 Data Portfolio</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // Scroll to Top Functionality
+        const scrollTop = document.querySelector('.scroll-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTop.classList.add('active');
+            } else {
+                scrollTop.classList.remove('active');
+            }
+        });
+        
+        scrollTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Add animation class to elements when they come into view
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animated');
+            
+            animatedElements.forEach(element => {
+                element.style.opacity = '0';
+            });
+            
+            setTimeout(() => {
+                animatedElements.forEach(element => {
+                    element.style.opacity = '1';
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>
